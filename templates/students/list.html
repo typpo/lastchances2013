@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for student in students %}
+      <h2><a href="{{ url_for('students.detail', slug=student.slug) }}">{{ student.name }}</a></h2>
+      <p>
+        {{ student.created_at.strftime('%H:%M %Y-%m-%d') }} |
+        {% with total=student.choices|length %}
+            {{ total }} choice {%- if total > 1 %}s{%- endif -%}
+        {% endwith %}
+      </p>
+    {% endfor %}
+{% endblock %}
