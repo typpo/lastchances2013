@@ -1,0 +1,116 @@
+/* 
+db-simple.css, a simple style file for a web page.
+Author:  Devin Balkcom, modified by Jennifer Lure
+*/
+
+body  {
+font-family: 'Lucida Grande', Arial, Helvetica, sans-serif;
+background: #FFFFFF;
+font-size: 14px; 
+line-height: 1.3;
+/*text-align: justify; */
+padding-right:50px;
+padding-left:50px;
+}
+
+
+#container 
+{ 
+   position: relative 
+}
+
+#sitetitle
+{ 
+position: static; 
+font-size: 28px;
+font-weight: bold;
+text-decoration: none;
+color: #11282D;
+}
+
+#sitetitle a
+{
+text-decoration: none;
+color: inherit;
+}
+
+#sitesubtitle
+{
+font-size: 14px;
+font-weight: normal;
+text-align: right;
+}	
+
+#listblurb
+{
+float: right;	
+}
+
+
+/* Menu design from Russ Weakley 
+http://css.maxdesign.com.au/listamatic/horizontal03.htm
+*/
+
+#menubar ul {
+padding-left: 0;
+margin-left: 0;
+background-color: #5D77AC;
+color: White;
+float: left;
+width: 100%;
+font-size: 14px;
+}
+
+#menubar li{
+display: inline;
+list-style-type: none;
+
+}
+
+#menubar ul li a{
+padding: 0.2em 1em;
+color: White;
+text-decoration: none;
+float: left;
+border-right: 1px solid #fff;
+font-size: 14px;
+}
+
+#menubar ul li a:hover
+{
+background-color: #8C9AB5;
+color: #fff;
+font-size: 14px;
+}
+
+
+h1 {
+color:  #306C53;
+text-decoration: none;
+font-size: 1.5em; 
+line-height:1.3;
+font-weight: bold;
+text-align: left;
+}
+
+
+h2 {
+color:  #61B99D;
+text-decoration: none;
+font-size: 1.2em; 
+line-height:1.3;
+font-weight: bold;
+text-align: left;
+}
+
+pre{
+background-color: rgb(230,230,255);
+border-style: dotted;
+border-width: 1px;
+padding: 1em;
+}
+
+.right_image{
+float:right;
+margin-left: 15px;
+}

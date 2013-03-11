@@ -1,0 +1,15 @@
+<!-- extend from base layout -->
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ session.user.name }} List your choices below</h1>
+<form action="" method="post" name="choose">
+    {{form.hidden_tag()}}
+            <p>
+                {{form.choice1(size=80)}}
+            </p>
+            <p>
+                {{form.choice2(size=80)}}
+            </p>
+    <p><input type="submit" value="Submit"></p>
+</form>
+{% endblock %}
