@@ -39,8 +39,8 @@ $ python manage.py shell
 NOTE: For all this to work you need to set the global environment variable MONGOHQ_URL to point to the DB online. Get in touch with me directly if you want this URL.
 
 ##TODO
-- [] Clear browser cookies on logout
-- []Make nicer CSS stylings
-- []Fix look-up so that bogus names cannot be submitted
-- []Add drop-down menu if lookup returns multiple matches
+- Clear browser cookies on logout
+- Make nicer CSS stylings
+- Fix look-up so that bogus names cannot be submitted
+- Add drop-down menu if lookup returns multiple matches
 
