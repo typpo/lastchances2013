@@ -2,7 +2,6 @@
 {% block content %}
 {% if session.user %}
 <h1>  Welcome, {{ session.user.name }}!</h1>
-<h2><a href="{{ url_for('makeChoices') }}"> Make your choices here </a></h2>
 <h2><a href="{{ url_for('flask_cas.logout') }}">Logout</a></h2>
 {% else %}
 <h1>Welcome to Dartmouth Last Chances 2013.</h1>

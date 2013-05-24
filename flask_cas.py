@@ -1,5 +1,5 @@
-import urllib
 import requests
+import urllib
 from xml.etree import ElementTree as etree
 from flask import Blueprint, request, redirect, session, url_for
 
