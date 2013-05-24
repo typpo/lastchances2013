@@ -19,7 +19,6 @@ class Selection(db.Model):
   created_at = db.Column(db.DateTime, default=db.func.now())
   chooser = db.Column(db.String, nullable=False)
   chosen = db.Column(db.String, nullable=False)
-  match = db.Column(db.Boolean, default=False)
   __table_args__ = (db.UniqueConstraint('chooser', 'chosen', name='_chooser_chosen_uc'),)
 
 def get_user(netid):
@@ -56,7 +55,7 @@ def choose():
   if chosen_user is None:
     return error_json("Could not find selected user."), 404
   
-  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'], match=False)
+  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'])
   db.session.add(selection)
 
   try:
