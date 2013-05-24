@@ -1,10 +1,20 @@
 {% extends "base.html" %}
+
 {% block content %}
-{% if session.user %}
-<h1>  Welcome, {{ session.user.name }}!</h1>
-<h2><a href="{{ url_for('flask_cas.logout') }}">Logout</a></h2>
-{% else %}
-<h1>Welcome to Dartmouth Last Chances 2013.</h1>
-<h2><a href="{{ url_for('flask_cas.login') }}">Login</a></h2>
-{% endif %}
+<div class="container">
+	<div class="col-lg-6 col-offset-3">
+		<div class="row">
+			<div class="page-header">
+				<h1><a href="/">Last Chances</a></h1>
+			</div>
+		</div>
+		<div class="row">
+			<form action="search" id="search">
+				<input type="text" name="query" class="input-large" placeholder="Search by name, nickname, year, etc." autofocus="">
+			</form>
+		</div>
+		<hr />
+		<div class="row" id="choices"></div>
+	</div>
+</div>
 {% endblock %}

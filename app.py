@@ -66,4 +66,4 @@ def choose():
   return json.dumps({'chosen':chosen_user['uid']})
 
 if __name__ == '__main__':
-	app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
