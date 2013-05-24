@@ -19,10 +19,11 @@ class Selection(db.Model):
   created_at = db.Column(db.DateTime, default=db.func.now())
   chooser = db.Column(db.String, nullable=False)
   chosen = db.Column(db.String, nullable=False)
+  match = db.Column(db.Boolean, default=False)
   __table_args__ = (db.UniqueConstraint('chooser', 'chosen', name='_chooser_chosen_uc'),)
 
 def get_user(netid):
-  users = requests.get('dnd.hackdartmouth.org', params={'uid': netid}).json
+  users = requests.get('http://dnd.hackdartmouth.org', params={'uid': netid}).json
   if len(users) < 1:
     return None
   return users[0]
@@ -55,7 +56,7 @@ def choose():
   if chosen_user is None:
     return error_json("Could not find selected user."), 404
   
-  selection = Selection(chooser=chooser_user.netid, chosen=chosen_user.netid)
+  selection = Selection(chooser=chooser_user.netid, chosen=chosen_user.netid, match=False)
   db.session.add(selection)
 
   try:
@@ -63,7 +64,7 @@ def choose():
   except:
     return error_json("User already selected."), 404
 
-  return json.dumps({'netid':chosen_user.netid})
+  return json.dumps({'chosen':chosen_user.netid})
 
 if __name__ == '__main__':
 	app.run(debug=True)
