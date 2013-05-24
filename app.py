@@ -56,7 +56,7 @@ def choose():
   if chosen_user is None:
     return error_json("Could not find selected user."), 404
   
-  selection = Selection(chooser=chooser_user.netid, chosen=chosen_user.netid, match=False)
+  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'], match=False)
   db.session.add(selection)
 
   try:
