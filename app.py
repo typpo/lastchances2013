@@ -23,7 +23,7 @@ class Selection(db.Model):
   __table_args__ = (db.UniqueConstraint('chooser', 'chosen', name='_chooser_chosen_uc'),)
 
 def get_user(netid):
-  users = requests.get('http://dnd.hackdartmouth.org', params={'uid': netid}).json
+  users = requests.get('http://dnd.hackdartmouth.org', params={'uid': netid}).json()
   if len(users) < 1:
     return None
   return users[0]
