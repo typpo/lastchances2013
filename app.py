@@ -64,7 +64,7 @@ def choose():
   except:
     return error_json("User already selected."), 404
 
-  return json.dumps({'chosen':chosen_user.netid})
+  return json.dumps({'chosen':chosen_user['uid']})
 
 if __name__ == '__main__':
 	app.run(debug=True)
