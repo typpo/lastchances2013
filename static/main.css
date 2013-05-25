@@ -38,12 +38,21 @@
 	margin: 0;
 }
 
+.name {
+	display: inline-block;
+}
+.year {
+	display: inline-block;
+	float: right;
+	text-align: right;
+
+}
+
+.alert {
+	margin-bottom: -20px;
+}
+
 .gist {
 	font-size: 14px;
 }
 
-.example-sports .league-name {
-	margin: 0 20px 5px 20px;
-	padding: 3px 0;
-	border-bottom: 1px solid #ccc;
-}

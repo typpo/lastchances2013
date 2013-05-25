@@ -42,14 +42,21 @@ def index(name=None):
 @app.route('/chosen', methods=['GET'])
 def chosen():
   results = Selection.query.filter(Selection.chooser == session['user']['netid']).all()
-  results = map(lambda n: n.chosen, results)
+  results = map(lambda n: get_user(n.chosen), results)
   return json.dumps(results)
-  
+
+@app.route('/unchoose', methods=['POST'])
+def unchoose():
+  selection = Selection.query.filter(Selection.chooser == session['user']['netid']).filter(Selection.chosen == request.form['choice']).first()
+  db.session.delete(selection)
+  db.session.commit()
+  return json.dumps({'deleted':'deleted'})
+
 @app.route('/choose', methods=['POST'])
 def choose():
   chooser_user = get_user(session['user']['netid'])
   if chooser_user is None:
-    return error_json("Could not find logged in user. Please contact us."), 404
+    return error_json("Could not find logged in user. Please contact us."), 401
 
   chosen_user = get_user(request.form['choice'])
   if chosen_user is None:
@@ -61,7 +68,7 @@ def choose():
   try:
     db.session.commit()
   except:
-    return error_json("User already selected."), 404
+    return error_json("User already selected."), 402
 
   return json.dumps({'chosen':chosen_user['uid']})
 
