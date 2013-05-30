@@ -45,7 +45,6 @@
 	display: inline-block;
 	float: right;
 	text-align: right;
-
 }
 
 .alert {
@@ -56,3 +55,20 @@
 	font-size: 14px;
 }
 
+.entry {
+	overflow: auto;
+	width: 100%;
+}
+.deletelink {
+	display: inline;
+	float: right;
+	margin-top: 5%;
+}
+.entryname {
+	display: inline;
+	float: left;
+}
+.entrydept {
+	display: inline;
+	float: left;
+}

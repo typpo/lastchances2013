@@ -47,10 +47,13 @@ def chosen():
 
 @app.route('/unchoose', methods=['POST'])
 def unchoose():
-  selection = Selection.query.filter(Selection.chooser == session['user']['netid']).filter(Selection.chosen == request.form['choice']).first()
-  db.session.delete(selection)
-  db.session.commit()
-  return json.dumps({'deleted':'deleted'})
+  try:
+    selection = Selection.query.filter(Selection.chooser == session['user']['netid']).filter(Selection.chosen == request.form['choice']).first()
+    db.session.delete(selection)
+    db.session.commit()
+    return json.dumps({'deleted':'deleted'})
+  except:
+    return json.dumps({'deleted':'error'})
 
 @app.route('/choose', methods=['POST'])
 def choose():
