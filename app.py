@@ -8,9 +8,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.register_blueprint(flask_cas)
-app.config["SECRET_KEY"] = "a^sci^21%02%92"
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
-
+app.config["SECRET_KEY"] = os.environ['SECRET_KEY']
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 class Selection(db.Model):
@@ -42,7 +41,7 @@ def index(name=None):
 @app.route('/chosen', methods=['GET'])
 def chosen():
   results = Selection.query.filter(Selection.chooser == session['user']['netid']).all()
-  results = map(lambda n: get_user(n.chosen), results)
+  results = map(lambda n: n.chosen, results)
   return json.dumps(results)
 
 @app.route('/unchoose', methods=['POST'])
@@ -53,7 +52,7 @@ def unchoose():
     db.session.commit()
     return json.dumps({'deleted':'deleted'})
   except:
-    return json.dumps({'deleted':'error'})
+    return json.dumps({'deleted':'error'}), 401
 
 @app.route('/choose', methods=['POST'])
 def choose():

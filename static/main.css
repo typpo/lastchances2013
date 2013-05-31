@@ -55,20 +55,14 @@
 	font-size: 14px;
 }
 
-.entry {
-	overflow: auto;
-	width: 100%;
+.panel {
+	border-color: green;
 }
-.deletelink {
-	display: inline;
-	float: right;
-	margin-top: 5%;
-}
-.entryname {
-	display: inline;
-	float: left;
-}
-.entrydept {
-	display: inline;
-	float: left;
+.unchoose {
+	color: #00703C;
+	line-height: 39px;
+	position: relative;
+	top: -2px;
+	opacity: 1;
+	font-size: 28px;
 }

@@ -1,23 +1,24 @@
 $(function() {
-	var template = Handlebars.compile('<div class="row entry"><h3 class="entryname">{{ name }}&nbsp;&nbsp;&nbsp;</h3> <h3 class="entrydept">{{ department }}</h3><a data-uid="{{uid}}" class="deletelink btn btn-danger btn-small"><span class="glyphicon glyphicon-remove"></span></a></div>');
+	var template = Handlebars.compile('<div class="panel fade in"><button type="button" class="close unchoose" data-dismiss="alert" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
 	var choose = function(person) {
 		$('#choices').prepend(template(person));
 	};
 
 	var fill_choices = function () {
-		$('#choices').html('');
 		$.get('/chosen', {}, function(data) {
+			$('#choices').html('');
 			$.each(data, function (i, choice) {
-				choose(choice);
+				$.getJSON('http://dnd.hackdartmouth.org/?callback=?', {'uid':choice}, function(data, textStatus, jqXHR) {
+					choose(data[0]);
+				});
 			});
 		}, 'json');
 	};
 
-	$(document).on('click', '.deletelink', function (e) {
+	$(document).on('click', '.unchoose', function (e) {
 		$.post('/unchoose', {'choice': $(this).data('uid') }, function() {
-			fill_choices();
+			$(this).parent().fadeOut();
 		}).fail(function(jqxhr) {
-			fill_choices();
 		});
 	});
 
@@ -26,23 +27,17 @@ $(function() {
 		name: 'people',
 		valueKey: 'name',
 		remote: {
-			url: 'http://dnd.hackdartmouth.org/?name=%QUERY',
-	    		/*
-	    		replace: function (url, encodedquery) {
-				var query = decodeURIComponent(encodedquery);
-				return url;
-			},
-			*/
+			url: 'http://dnd.hackdartmouth.org/%QUERY',
 			dataType: 'jsonp'
 		},
 		template: Handlebars.compile('<div data-uid="{{ uid }}" class="name">{{ name }}</div><div class="year">{{department}}</div>'),
 	});
 
 	$(search).on('typeahead:selected', function(e, data) {
+		choose(data);
 		$.post('/choose', {'choice': data['uid']}, function() {
 			$(".alert").hide()
 			$("#search input").val('');
-			choose(data);
 		}).fail(function(jqxhr) {
 			var data = JSON.parse(jqxhr.responseText);
 			$(".alerttext").html(data.error);
