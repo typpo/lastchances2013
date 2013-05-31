@@ -8,7 +8,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.register_blueprint(flask_cas)
-app.config["SECRET_KEY"] = 'abcdefghijklmnopqrstuvwxyz'
+app.config["SECRET_KEY"] = os.environ['COOKIE_SECRET']
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///lc.db'
 db = SQLAlchemy(app)
 
