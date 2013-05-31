@@ -1,8 +1,8 @@
 $(function() {
-	var template = Handlebars.compile('<div class="panel fade in"><button type="button" class="close unchoose" data-dismiss="alert" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
+	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
 	var choose = function(person) {
 		var element = $(template(person));
-		$('#choices').prepend(element);
+		element.prependTo('#choices').hide().slideDown();
 		return element;
 	};
 
@@ -18,8 +18,8 @@ $(function() {
 	};
 
 	$(document).on('click', '.unchoose', function (e) {
+		$(this).parent().slideUp();
 		$.post('/unchoose', {'choice': $(this).data('uid') }, function() {
-			$(this).parent().fadeOut();
 		}).fail(function(jqxhr) {
 		});
 	});
