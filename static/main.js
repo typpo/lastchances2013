@@ -1,7 +1,9 @@
 $(function() {
 	var template = Handlebars.compile('<div class="panel fade in"><button type="button" class="close unchoose" data-dismiss="alert" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
 	var choose = function(person) {
-		$('#choices').prepend(template(person));
+		var element = $(template(person));
+		$('#choices').prepend(element);
+		return element;
 	};
 
 	var fill_choices = function () {
@@ -34,7 +36,7 @@ $(function() {
 	});
 
 	$(search).on('typeahead:selected', function(e, data) {
-		choose(data);
+		var element = choose(data);
 		$.post('/choose', {'choice': data['uid']}, function() {
 			$(".alert").hide()
 			$("#search input").val('');
@@ -42,6 +44,7 @@ $(function() {
 			var data = JSON.parse(jqxhr.responseText);
 			$(".alerttext").html(data.error);
 			$(".alert").show();
+			element.remove();
 		});
 	});
 

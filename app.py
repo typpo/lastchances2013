@@ -8,8 +8,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.register_blueprint(flask_cas)
-app.config["SECRET_KEY"] = os.environ['SECRET_KEY']
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['DATABASE_URL']
+app.config["SECRET_KEY"] = 'abcdefghijklmnopqrstuvwxyz'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 
 class Selection(db.Model):
@@ -40,14 +40,16 @@ def index(name=None):
 
 @app.route('/chosen', methods=['GET'])
 def chosen():
-  results = Selection.query.filter(Selection.chooser == session['user']['netid']).all()
+  chooser_user = get_user(session['user']['netid'])
+  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).all()
   results = map(lambda n: n.chosen, results)
   return json.dumps(results)
 
 @app.route('/unchoose', methods=['POST'])
 def unchoose():
   try:
-    selection = Selection.query.filter(Selection.chooser == session['user']['netid']).filter(Selection.chosen == request.form['choice']).first()
+    chooser_user = get_user(session['user']['netid'])
+    selection = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.chosen == request.form['choice']).first()
     db.session.delete(selection)
     db.session.commit()
     return json.dumps({'deleted':'deleted'})
