@@ -32,7 +32,7 @@ $(function() {
 			url: 'http://dnd.hackdartmouth.org/%QUERY?department=\'|UG|TU|TH',
 			dataType: 'jsonp'
 		},
-		template: Handlebars.compile('<div data-uid="{{ uid }}" class="name">{{ name }}</div><div class="year">{{department}}</div>'),
+		template: Handlebars.compile('<div data-uid="{{ uid }}" class="name">{{ name }} &nbsp;&nbsp;{{department}}</div>'),
 	});
 
 	$(search).on('typeahead:selected', function(e, data) {
