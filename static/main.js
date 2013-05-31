@@ -29,7 +29,7 @@ $(function() {
 		name: 'people',
 		valueKey: 'name',
 		remote: {
-			url: 'http://dnd.hackdartmouth.org/%QUERY?department=\'|UG|TU|TH',
+			url: 'http://dnd.hackdartmouth.org/%QUERY?department=%5E\'|%5EUG%24|%5ETU%24|%5ETH%24',
 			dataType: 'jsonp'
 		},
 		template: Handlebars.compile('<div data-uid="{{ uid }}" class="name">{{ name }} &nbsp;&nbsp;{{department}}</div>'),
