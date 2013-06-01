@@ -35,4 +35,4 @@ def login():
 @flask_cas.route("/logout/")
 def logout():
     session.pop('user', None)
-    return redirect(url_for('index'))
+    return redirect('https://login.dartmouth.edu/cas/logout')
