@@ -5,10 +5,12 @@ from datetime import datetime
 from flask import Flask, request, redirect, session, url_for, render_template
 from flask_cas import *
 from flask.ext.sqlalchemy import SQLAlchemy
+import random
+from string import hexdigits
 
 app = Flask(__name__)
 app.register_blueprint(flask_cas)
-app.config["SECRET_KEY"] = os.environ['COOKIE_SECRET']
+app.config["SECRET_KEY"] = os.environ.get('COOKIE_SECRET', ''.join(random.choice(hexdigits) for _ in range(30)))
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///lc.db'
 db = SQLAlchemy(app)
 
