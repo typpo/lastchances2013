@@ -6,7 +6,7 @@ $(function() {
 		return element;
 	};
 
-	var match_template = Handlebars.compile('<div class="panel"><h4>{{name}}&nbsp;&nbsp;&nbsp;{{department}}</h4></div>")
+	var match_template = Handlebars.compile('<div class="panel"><h4>{{name}}&nbsp;&nbsp;&nbsp;{{department}}</h4></div>');
 	var match = function(person) {
 		var element = $(match_template(person));
 		element.prependTo('#matches').hide().slideDown();
