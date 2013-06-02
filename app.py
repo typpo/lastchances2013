@@ -60,7 +60,7 @@ def matches():
 def unchoose():
   try:
     chooser_user = get_user(session['user']['netid'])
-    selection = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.chosen == request.form['choice']).first()
+    selection = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.chosen == request.form['choice']).filter(Selection.match == False).first()
     db.session.delete(selection)
     db.session.commit()
     return json.dumps({'deleted':'deleted'})
@@ -86,6 +86,15 @@ def choose():
     return error_json("User already selected."), 402
 
   return json.dumps({'chosen':chosen_user['uid']})
+
+def compute_matches():
+  selections = Selection.query.all()
+  for selection in selections:
+    opposite = Selection.query.filter(Selection.chooser==selection.chosen).filter(Selection.chosen==selection.chooser).all()
+    if len(opposite) > 0:
+      selection.match = True
+      db.session.add(selection)
+  db.session.commit()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)

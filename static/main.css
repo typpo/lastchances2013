@@ -62,6 +62,14 @@
 
 .panel {
 	border-color: green;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.panel.match {
+	background-color: #00703C;
+	color: white;
 }
 .unchoose {
 	color: #00703C;
