@@ -6,6 +6,13 @@ $(function() {
 		return element;
 	};
 
+	var match_template = Handlebars.compile('<div class="panel"><h4>{{name}}&nbsp;&nbsp;&nbsp;{{department}}</h4></div>")
+	var match = function(person) {
+		var element = $(match_template(person));
+		element.prependTo('#matches').hide().slideDown();
+		return element;
+	};
+
 	var fill_choices = function () {
 		$.get('/chosen', {}, function(data) {
 			$('#choices').html('');
@@ -16,6 +23,18 @@ $(function() {
 			});
 		}, 'json');
 	};
+
+	var fill_matches = function () {
+		$.get('/matches', {}, function(data) {
+			$('#matches').html('');
+			$.each(data, function (i, choice) {
+				$.getJSON('http://dnd.hackdartmouth.org/?callback=?', {'uid':choice}, function(data, textStatus, jqXHR) {
+					match(data[0]);
+				});
+			});
+		}, 'json');
+	};
+		
 
 	$(document).on('click', '.unchoose', function (e) {
 		$(this).parent().slideUp();
@@ -49,5 +68,6 @@ $(function() {
 	});
 
 	fill_choices();
+	fill_matches();
 
 });

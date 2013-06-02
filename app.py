@@ -18,6 +18,7 @@ class Selection(db.Model):
   created_at = db.Column(db.DateTime, default=db.func.now())
   chooser = db.Column(db.String, nullable=False)
   chosen = db.Column(db.String, nullable=False)
+  match = db.Column(db.Boolean, default=False)
   __table_args__ = (db.UniqueConstraint('chooser', 'chosen', name='_chooser_chosen_uc'),)
 
 def get_user(netid):
@@ -41,9 +42,17 @@ def index(name=None):
 @app.route('/chosen', methods=['GET'])
 def chosen():
   chooser_user = get_user(session['user']['netid'])
-  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).all()
+  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.match == False).all()
   results = map(lambda n: n.chosen, results)
   return json.dumps(results)
+
+@app.route('/matches', methods=['GET'])
+def matches():
+  chooser_user = get_user(session['user']['netid'])
+  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.match == True).all()
+  results = map(lambda n: n.chosen, results)
+  return json.dumps(results)
+
 
 @app.route('/unchoose', methods=['POST'])
 def unchoose():
@@ -66,7 +75,7 @@ def choose():
   if chosen_user is None:
     return error_json("Could not find selected user."), 404
   
-  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'])
+  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'], match=False)
   db.session.add(selection)
 
   try:
