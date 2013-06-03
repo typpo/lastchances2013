@@ -43,7 +43,7 @@ $(function() {
 		});
 	});
 
-	$(".alert").hide();
+	$(".alert-danger").hide();
 	var search = $('#search input').typeahead({
 		name: 'people',
 		valueKey: 'name',
@@ -57,12 +57,12 @@ $(function() {
 	$(search).on('typeahead:selected', function(e, data) {
 		var element = choose(data);
 		$.post('/choose', {'choice': data['uid']}, function() {
-			$(".alert").hide()
+			$(".alert-danger").hide()
 			$("#search input").val('');
 		}).fail(function(jqxhr) {
 			var data = JSON.parse(jqxhr.responseText);
-			$(".alerttext").html(data.error);
-			$(".alert").show();
+			$(".alert-danger .alerttext").html(data.error);
+			$(".alert-danger").show();
 			element.remove();
 		});
 	});

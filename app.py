@@ -39,7 +39,10 @@ def verify_login():
 
 @app.route('/')
 def index(name=None):
-  return render_template('index.html')
+  cur_user = get_user(session['user']['netid'])
+  num_selections = Selection.query.filter(Selection.chosen == cur_user['uid']).count()
+  num_matches = Selection.query.filter(Selection.chosen == cur_user['uid']).filter(Selection.match == True).count()
+  return render_template('index.html', num_selections=num_selections, num_matches=num_matches)
 
 @app.route('/chosen', methods=['GET'])
 def chosen():

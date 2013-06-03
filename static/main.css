@@ -52,8 +52,12 @@
 	text-align: right;
 }
 
-.alert {
+.alert-danger {
 	margin-bottom: -20px;
+}
+.alert-success {
+	margin: 0px;
+	margin-top: -10px;
 }
 
 .gist {
@@ -79,6 +83,6 @@
 	opacity: 1;
 	font-size: 28px;
 }
-.alert {
+.alert-danger {
 	display: none;
 }
