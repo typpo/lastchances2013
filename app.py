@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from datetime import datetime
-from flask import Flask, request, redirect, session, url_for, render_template
+from flask import Flask, request, redirect, session, url_for, render_template, g
 from flask_cas import *
 from flask.ext.sqlalchemy import SQLAlchemy
 import random
@@ -14,90 +14,99 @@ app.config["SECRET_KEY"] = os.environ.get('COOKIE_SECRET', ''.join(random.choice
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///lc.db'
 db = SQLAlchemy(app)
 
-class Selection(db.Model):
-  __tablename__ = 'user'
+class Commitment(db.Model):
+  __tablename__ = 'commitment'
   id = db.Column(db.Integer, primary_key=True)
   created_at = db.Column(db.DateTime, default=db.func.now())
-  chooser = db.Column(db.String, nullable=False)
-  chosen = db.Column(db.String, nullable=False)
-  match = db.Column(db.Boolean, default=False)
-  __table_args__ = (db.UniqueConstraint('chooser', 'chosen', name='_chooser_chosen_uc'),)
 
-def get_user(netid):
-  users = requests.get('http://dnd.hackdartmouth.org', params={'uid': netid}).json()
-  if len(users) < 1:
-    return None
-  return users[0]
+  chooser = db.Column(db.String, db.ForeignKey("user.net_id"), nullable=False)
+  coupleid_hash = db.Column(db.String, nullable=False)
+
+  match = db.Column(db.String, default=None)
+
+  __table_args__ = (db.UniqueConstraint('chooser', 'coupleid_hash', name='_chooser_coupleid_hash_uc'),)
+
+class User(db.Model):
+  __tablename__ = 'user'
+  name = db.Column(db.String, nullable=False)
+  net_id = db.Column(db.String, primary_key=True)
+  public_key = db.Column(db.String, nullable=False)
+  encrypted_private_key = db.Column(db.String, nullable=False)
 
 def error_json(text):
   return json.dumps({'error': text})
 
 @app.before_request
 def verify_login():
+  if '/static/' in request.path:
+    return
+
   if request.endpoint != 'flask_cas.login' and ('user' not in session):
     return redirect(url_for('flask_cas.login'))
 
+  if 'user' in session:
+    g.user = User.query.get(session['user']['netid'])
+    if g.user is None:
+      return render_template('register.html')
+
 @app.route('/')
 def index(name=None):
-  cur_user = get_user(session['user']['netid'])
-  num_selections = Selection.query.filter(Selection.chosen == cur_user['uid']).count()
-  num_matches = Selection.query.filter(Selection.chosen == cur_user['uid']).filter(Selection.match == True).count()
-  return render_template('index.html', num_selections=num_selections, num_matches=num_matches)
+  return render_template('index.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+  new_user = User(name=request.form['name'], \
+                  net_id = session['user']['netid'], \
+                  encrypted_private_key=request.form['encrypted_private_key'], \
+                  public_key=request.form['public_key'])
+  db.session.add(new_user)
+
+  try:
+    db.session.commit()
+  except:
+    return error_json("User already registered!"), 402
+
+  return redirect(url_for('index'))
 
 @app.route('/chosen', methods=['GET'])
 def chosen():
-  chooser_user = get_user(session['user']['netid'])
-  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.match == False).all()
-  results = map(lambda n: n.chosen, results)
-  return json.dumps(results)
+  #TODO
+  return json.dumps([])
 
 @app.route('/matches', methods=['GET'])
 def matches():
-  chooser_user = get_user(session['user']['netid'])
-  results = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.match == True).all()
-  results = map(lambda n: n.chosen, results)
+  results = Commitment.query.filter(Commitment.chooser == g['user'].net_id).filter(Commitment.match != None).all()
+  results = map(lambda r: r.match, results)
   return json.dumps(results)
-
 
 @app.route('/unchoose', methods=['POST'])
 def unchoose():
-  try:
-    chooser_user = get_user(session['user']['netid'])
-    selection = Selection.query.filter(Selection.chooser == chooser_user['uid']).filter(Selection.chosen == request.form['choice']).filter(Selection.match == False).first()
-    db.session.delete(selection)
-    db.session.commit()
-    return json.dumps({'deleted':'deleted'})
-  except:
-    return json.dumps({'deleted':'error'}), 401
+  #TODO
+  return json.dumps({'deleted':'deleted'})
 
 @app.route('/choose', methods=['POST'])
 def choose():
-  chooser_user = get_user(session['user']['netid'])
-  if chooser_user is None:
-    return error_json("Could not find logged in user. Please contact us."), 401
-
-  chosen_user = get_user(request.form['choice'])
-  if chosen_user is None:
-    return error_json("Could not find selected user."), 404
-  
-  selection = Selection(chooser=chooser_user['uid'], chosen=chosen_user['uid'], match=False)
-  db.session.add(selection)
+  commitment = Commitment(chooser=g['user'].net_id, \
+                          coupleid_hash=request.form['coupleid_hash'], \
+                          match=None)
+  db.session.add(commitment)
 
   try:
     db.session.commit()
   except:
-    return error_json("User already selected."), 402
-
-  return json.dumps({'chosen':chosen_user['uid']})
+    return error_json("Could not add commitment"), 402
 
 def compute_matches():
-  selections = Selection.query.all()
-  for selection in selections:
-    opposite = Selection.query.filter(Selection.chooser==selection.chosen).filter(Selection.chosen==selection.chooser).all()
+  commitments = Commitmennt.query.all()
+  for commitment in commitments:
+    opposite = Commitment.query \
+                         .filter(Commitment.coupleid_hash == commitment.coupleid_hash) \
+                         .filter(Commitment.chooser != commitment.chooser).all()
     if len(opposite) > 0:
-      selection.match = True
-      db.session.add(selection)
+      commitment.match = True
+      db.session.add(commitment)
   db.session.commit()
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)

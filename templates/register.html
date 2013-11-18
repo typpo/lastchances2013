@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <form class="form-horizontal">
+      <div class="row">
+          <label for="name" class="col col-lg-2 control-label">Name</label>
+          <div class="col col-lg-10">
+              <input type="text" id="name" placeholder="Name" />
+          </div>
+      </div>
+      <div class="row">
+          <label for="passowrd" class="col col-lg-2 control-label">Password</label>
+          <div class="col col-lg-10">
+              <input type="password" id="password" placeholder="Password" />
+          </div>
+          <div class="col col-lg-10 col-offset-2">
+              <a id="register" class="btn btn-default">Register</a>
+          </div>
+      </div>
+  </form>
+{% endblock %}

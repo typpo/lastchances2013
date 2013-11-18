@@ -1,4 +1,13 @@
 $(function() {
+
+    $('#register').click(function (e) {
+
+        $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key}, function () {
+
+        });
+       console.log("hello");
+    });
+
 	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
 	var choose = function(person) {
 		var element = $(template(person));
