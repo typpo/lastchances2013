@@ -4,12 +4,12 @@ $(function() {
 
         var key_pair = sjcl.ecc.elGamal.generateKeys();
 
-        var public_key_json = sjcl.json.encode(key_pair.pub.get());
-        var private_key_json = sjcl.json.encode(key_pair.sec.get());
+        var public_key_json = JSON.stringify(key_pair.pub.get());
+        var private_key_json = JSON.stringify(key_pair.sec.get());
         var encrypted_private_key = sjcl.json.encrypt($('#password').val(), private_key_json);
 
         $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key_json}, function () {
-            console.log("Worked!");
+            window.location.replace("/");
         });
     });
 
@@ -61,11 +61,10 @@ $(function() {
 	var search = $('#search input').typeahead({
 		name: 'people',
 		valueKey: 'name',
-		remote: {
-			url: 'http://dnd.hackdartmouth.org/%QUERY?department=%5E\'|%5EUG%24|%5ETU%24|%5ETH%24|%5EGR%24',
-			dataType: 'jsonp'
+		prefetch: {
+            url: '/participants'
 		},
-		template: Handlebars.compile('<div data-uid="{{ uid }}" class="name">{{ name }} &nbsp;&nbsp;{{department}}</div>'),
+		template: Handlebars.compile('<div data-uid="{{ public_key }}" class="name">{{ name }} &nbsp;&nbsp;</div>'),
 	});
 
 	$(search).on('typeahead:selected', function(e, data) {

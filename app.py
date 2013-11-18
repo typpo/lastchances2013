@@ -46,12 +46,13 @@ def verify_login():
 
   if 'user' in session:
     g.user = User.query.get(session['user']['netid'])
-    if g.user is None:
+    if (g.user is None) and (request.path != '/register'):
       return render_template('register.html')
 
 @app.route('/')
 def index(name=None):
-  return render_template('index.html')
+  private_key = g.user.encrypted_private_key
+  return render_template('index.html', private_key=private_key)
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -66,6 +67,7 @@ def register():
   except:
     return error_json("User already registered!"), 402
 
+  return json.dumps({'success': True})
   return redirect(url_for('index'))
 
 @app.route('/chosen', methods=['GET'])
@@ -73,9 +75,15 @@ def chosen():
   #TODO
   return json.dumps([])
 
+@app.route('/participants', methods=['GET'])
+def participants():
+  users = map(lambda u: {'name': u.name, 'public_key': u.public_key}, User.query.all())
+  return json.dumps(users)
+
+
 @app.route('/matches', methods=['GET'])
 def matches():
-  results = Commitment.query.filter(Commitment.chooser == g['user'].net_id).filter(Commitment.match != None).all()
+  results = Commitment.query.filter(Commitment.chooser == g.user.net_id).filter(Commitment.match != None).all()
   results = map(lambda r: r.match, results)
   return json.dumps(results)
 
