@@ -2,23 +2,15 @@ $(function() {
 
     $('#register').click(function (e) {
 
-        console.log("hello1");
-        var private_key = generateP224PrivateKey();
-        console.log("hello2");
-        var user = diffieHellman(p224, p224BaseCoords, private_key);
-        console.log("hello3");
-        var public_key = user.computePublicKey();
-        console.log("hello4");
+        var key_pair = sjcl.ecc.elGamal.generateKeys();
 
-        var encrypted_private_key = "garbage";
-        console.log("hello5");
-        var public_key = "trash";
-        console.log("hello6");
+        var public_key_json = sjcl.json.encode(key_pair.pub.get());
+        var private_key_json = sjcl.json.encode(key_pair.sec.get());
+        var encrypted_private_key = sjcl.json.encrypt($('#password').val(), private_key_json);
 
-        $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key}, function () {
-
+        $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key_json}, function () {
+            console.log("Worked!");
         });
-        console.log("hello7");
     });
 
 	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
