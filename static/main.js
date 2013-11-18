@@ -2,10 +2,23 @@ $(function() {
 
     $('#register').click(function (e) {
 
+        console.log("hello1");
+        var private_key = generateP224PrivateKey();
+        console.log("hello2");
+        var user = diffieHellman(p224, p224BaseCoords, private_key);
+        console.log("hello3");
+        var public_key = user.computePublicKey();
+        console.log("hello4");
+
+        var encrypted_private_key = "garbage";
+        console.log("hello5");
+        var public_key = "trash";
+        console.log("hello6");
+
         $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key}, function () {
 
         });
-       console.log("hello");
+        console.log("hello7");
     });
 
 	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
