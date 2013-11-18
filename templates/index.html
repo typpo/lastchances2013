@@ -19,3 +19,16 @@
         <small class='text-muted'>Hacker Club takes no responsibility for the outcome of your matches.</small>
     </div>
 {% endblock %}
+
+{% block autojs %}
+        <script>
+            var password = window.prompt("Enter your password please: ", "");
+            var encrypted_private_key = {{private_key|safe}};
+            var private_key_exponent = sjcl.json.decrypt(password, encrypted_private_key);
+            var exponent_bn = sjcl.bn.fromBits(JSON.parse(private_key_exponent));
+
+            window.private_key = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.c256, exponent_bn);
+
+        </script>
+
+{% endblock %}

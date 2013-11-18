@@ -38,13 +38,8 @@
 		<script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.js"></script>
 		<script src="{{ url_for('static', filename='handlebars.js') }}"></script>
         <script src="{{ url_for('static', filename='sjcl.js') }}"></script>
-        <script>
-            var encrypted_private_key = JSON.stringify({{private_key|safe}});
-            var private_key_json = sjcl.json.decrypt('test', encrypted_private_key);
-            var private_key = JSON.parse(private_key_json);
-
-            var password = window.prompt("Enter your password please: ", "");
-        </script>
 		<script src="{{ url_for('static', filename='main.js') }}"></script>
+        {% block autojs %}
+        {% endblock %}
 	</body>
 </html>

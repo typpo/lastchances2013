@@ -30,7 +30,7 @@ class User(db.Model):
   __tablename__ = 'user'
   name = db.Column(db.String, nullable=False)
   net_id = db.Column(db.String, primary_key=True)
-  public_key = db.Column(db.String, nullable=False)
+  public_key_bits = db.Column(db.String, nullable=False)
   encrypted_private_key = db.Column(db.String, nullable=False)
 
 def error_json(text):
@@ -52,14 +52,14 @@ def verify_login():
 @app.route('/')
 def index(name=None):
   private_key = g.user.encrypted_private_key
-  return render_template('index.html', private_key=private_key)
+  return render_template('index.html', private_key=json.dumps(private_key))
 
 @app.route('/register', methods=['POST'])
 def register():
   new_user = User(name=request.form['name'], \
                   net_id = session['user']['netid'], \
                   encrypted_private_key=request.form['encrypted_private_key'], \
-                  public_key=request.form['public_key'])
+                  public_key_bits=request.form['public_key_bits'])
   db.session.add(new_user)
 
   try:
@@ -77,7 +77,7 @@ def chosen():
 
 @app.route('/participants', methods=['GET'])
 def participants():
-  users = map(lambda u: {'name': u.name, 'public_key': u.public_key}, User.query.all())
+  users = map(lambda u: {'name': u.name, 'public_key_bits': u.public_key_bits}, User.query.all())
   return json.dumps(users)
 
 
@@ -94,7 +94,7 @@ def unchoose():
 
 @app.route('/choose', methods=['POST'])
 def choose():
-  commitment = Commitment(chooser=g['user'].net_id, \
+  commitment = Commitment(chooser=g.user.net_id, \
                           coupleid_hash=request.form['coupleid_hash'], \
                           match=None)
   db.session.add(commitment)
@@ -103,6 +103,8 @@ def choose():
     db.session.commit()
   except:
     return error_json("Could not add commitment"), 402
+
+  return "Success"
 
 def compute_matches():
   commitments = Commitmennt.query.all()

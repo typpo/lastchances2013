@@ -4,11 +4,12 @@ $(function() {
 
         var key_pair = sjcl.ecc.elGamal.generateKeys();
 
-        var public_key_json = JSON.stringify(key_pair.pub.get());
-        var private_key_json = JSON.stringify(key_pair.sec.get());
-        var encrypted_private_key = sjcl.json.encrypt($('#password').val(), private_key_json);
+        var public_key_bits = JSON.stringify(key_pair.pub._point.toBits());
+        var private_key_bits = JSON.stringify(key_pair.sec._exponent.toBits());
 
-        $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key': public_key_json}, function () {
+        var encrypted_private_key = sjcl.json.encrypt($('#password').val(), private_key_bits);
+
+        $.post('/register', {'name': $('#name').val(), 'encrypted_private_key': encrypted_private_key, 'public_key_bits': public_key_bits}, function () {
             window.location.replace("/");
         });
     });
@@ -61,15 +62,20 @@ $(function() {
 	var search = $('#search input').typeahead({
 		name: 'people',
 		valueKey: 'name',
-		prefetch: {
+		remote: {
             url: '/participants'
 		},
-		template: Handlebars.compile('<div data-uid="{{ public_key }}" class="name">{{ name }} &nbsp;&nbsp;</div>'),
+		template: Handlebars.compile('<div class="name">{{ name }} &nbsp;&nbsp;</div>'),
 	});
 
 	$(search).on('typeahead:selected', function(e, data) {
+        var point = sjcl.ecc.curves.c256.fromBits(JSON.parse(data['public_key_bits']));
+        var pub_key = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c256, point);
+        
+        var coupleid_hash = sjcl.codec.hex.fromBits(window.private_key.dh(pub_key));
+
 		var element = choose(data);
-		$.post('/choose', {'choice': data['uid']}, function() {
+		$.post('/choose', {'coupleid_hash': coupleid_hash}, function() {
 			$(".alert-danger").hide()
 			$("#search input").val('');
 		}).fail(function(jqxhr) {
