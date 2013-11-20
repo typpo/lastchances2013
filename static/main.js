@@ -21,7 +21,7 @@ $(function() {
 		return element;
 	};
 
-	var match_template = Handlebars.compile('<div class="panel match"><h4>{{name}}&nbsp;&nbsp;&nbsp;{{department}}<span class="matchbg pull-right">match!</span></h4></div>');
+	var match_template = Handlebars.compile('<div class="panel match"><h4>{{name}}<span class="matchbg pull-right">match!</span></h4></div>');
 	var match = function(person) {
 		var element = $(match_template(person));
 		element.prependTo('#matches').hide().slideDown();
@@ -43,9 +43,8 @@ $(function() {
 		$.get('/matches', {}, function(data) {
 			$('#matches').html('');
 			$.each(data, function (i, choice) {
-				$.getJSON('http://dnd.hackdartmouth.org/?callback=?', {'uid':choice}, function(data, textStatus, jqXHR) {
-					match(data[0]);
-				});
+              debugger;
+              match(choice);
 			});
 		}, 'json');
 	};

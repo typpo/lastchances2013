@@ -11,7 +11,7 @@ from string import hexdigits
 app = Flask(__name__)
 app.register_blueprint(flask_cas)
 app.config["SECRET_KEY"] = os.environ.get('COOKIE_SECRET', ''.join(random.choice(hexdigits) for _ in range(30)))
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///lc.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///matchmaking.db'
 db = SQLAlchemy(app)
 
 class Commitment(db.Model):
@@ -19,12 +19,15 @@ class Commitment(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   created_at = db.Column(db.DateTime, default=db.func.now())
 
-  chooser = db.Column(db.String, db.ForeignKey("user.net_id"), nullable=False)
+  chooser_id = db.Column(db.String, db.ForeignKey("user.net_id"), nullable=False)
+  chooser = db.relationship("User", backref=db.backref('commitments'), foreign_keys=[chooser_id])
+
   coupleid_hash = db.Column(db.String, nullable=False)
 
-  match = db.Column(db.String, default=None)
+  match_id = db.Column(db.String, db.ForeignKey("user.net_id"), default=None)
+  match = db.relationship("User", foreign_keys=[match_id])
 
-  __table_args__ = (db.UniqueConstraint('chooser', 'coupleid_hash', name='_chooser_coupleid_hash_uc'),)
+  __table_args__ = (db.UniqueConstraint('chooser_id', 'coupleid_hash', name='_chooser_id_coupleid_hash_uc'),)
 
 class User(db.Model):
   __tablename__ = 'user'
@@ -83,18 +86,26 @@ def participants():
 
 @app.route('/matches', methods=['GET'])
 def matches():
-  results = Commitment.query.filter(Commitment.chooser == g.user.net_id).filter(Commitment.match != None).all()
-  results = map(lambda r: r.match, results)
+  results = Commitment.query.filter(Commitment.chooser_id == g.user.net_id).filter(Commitment.match != None).all()
+  results = map(lambda r: {'name': r.match.name }, results)
   return json.dumps(results)
 
 @app.route('/unchoose', methods=['POST'])
 def unchoose():
-  #TODO
+  commitment = Commitment.query.filter(Commitment.chooser == g.user).filter(Commitment.coupleid_hash == request.form['coupleid_hash']).first()
+  if commitment != None:
+    db.session.delete(commitment)
+    
+  try:
+    db.session.commit()
+  except:
+    return error_json("Could not remove commitment"), 402
+
   return json.dumps({'deleted':'deleted'})
 
 @app.route('/choose', methods=['POST'])
 def choose():
-  commitment = Commitment(chooser=g.user.net_id, \
+  commitment = Commitment(chooser=g.user, \
                           coupleid_hash=request.form['coupleid_hash'], \
                           match=None)
   db.session.add(commitment)
@@ -107,13 +118,13 @@ def choose():
   return "Success"
 
 def compute_matches():
-  commitments = Commitmennt.query.all()
+  commitments = Commitment.query.all()
   for commitment in commitments:
     opposite = Commitment.query \
                          .filter(Commitment.coupleid_hash == commitment.coupleid_hash) \
-                         .filter(Commitment.chooser != commitment.chooser).all()
+                         .filter(Commitment.chooser_id != commitment.chooser_id).all()
     if len(opposite) > 0:
-      commitment.match = True
+      commitment.match_id = opposite[0].chooser_id
       db.session.add(commitment)
   db.session.commit()
 
