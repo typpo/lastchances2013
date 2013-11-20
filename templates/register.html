@@ -1,26 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="row">Welcome to Secure Last Chances. Please choose a password.</div>
+<div class="row"><p>Safe Match is crytpographically secure, so your preferences are secret even if a hacker steals the raw data! Choose a password to get started:</p>
   <form class="form-horizontal">
       <div class="row">
-          <label for="name" class="col col-lg-2 control-label">Name</label>
-          <div class="col col-lg-10">
-              <input type="text" id="name" placeholder="Name" />
-          </div>
-      </div>
-      <div class="row">
-          <label for="passowrd" class="col col-lg-2 control-label">Password</label>
-          <div class="col col-lg-10">
+          <div class="col col-lg-11">
               <input type="password" id="password" placeholder="Password" />
-          </div>
-          <div class="col col-lg-10 col-offset-2">
-              <a id="register" class="btn btn-default">Register</a>
+              <input type="password" id="confirmpassword" placeholder="Confirm Password" />
+              <button type="button" id="register" class="btn btn-primary btn-large btn-block">Let's Go!</a>
           </div>
       </div>
   </form>
-{% endblock %}
-
-{% block autojs %}
-
 {% endblock %}

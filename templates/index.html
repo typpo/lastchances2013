@@ -9,7 +9,7 @@
     </div>
     <hr />
     <div class="row" id="matchrow">
-        <div class="alert alert-success"><span class="alerttext">{{num_selections}} people have selected you! You have {{num_matches}} matches!</span></div>
+        <div class="alert alert-success"><span class="alerttext">You have {{num_matches}} matches!</span></div>
         <span id="matches"></span>
     </div>
     <div class="row" id="choices"></div>
@@ -20,11 +20,16 @@
     </div>
 {% endblock %}
 
-{% block autojs %}
+{% block get_password %}
+    <script>
+            window.password = window.prompt("Enter your password please: ", "");
+    </script>
+{% endblock %}
+
+{% block load_priv_key %}
         <script>
-            var password = window.prompt("Enter your password please: ", "");
             var encrypted_private_key = {{private_key|safe}};
-            var private_key_exponent = sjcl.json.decrypt(password, encrypted_private_key);
+            var private_key_exponent = sjcl.json.decrypt(window.password, encrypted_private_key);
             var exponent_bn = sjcl.bn.fromBits(JSON.parse(private_key_exponent));
 
             window.private_key = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.c256, exponent_bn);

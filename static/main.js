@@ -2,6 +2,16 @@ $(function() {
 
     $('#register').click(function (e) {
 
+        if ($('#password').val().length < 1) {
+          window.alert("Password cannot be blank");
+          return;
+        }
+
+        if ($('#password').val() != $('#confirmpassword').val()) {
+          window.alert("Passwords do not match!");
+          return;
+        }
+
         var key_pair = sjcl.ecc.elGamal.generateKeys();
 
         var public_key_bits = JSON.stringify(key_pair.pub._point.toBits());
@@ -14,8 +24,9 @@ $(function() {
         });
     });
 
-	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-uid="{{uid}}">&times;</button><h4>{{ name }}&nbsp;&nbsp;&nbsp;{{ department }}</h4></div>');
+	var template = Handlebars.compile('<div class="panel"><button type="button" class="close unchoose" data-coupleidhash="{{coupleid_hash}}">&times;</button><h4>{{ name }}</h4></div>');
 	var choose = function(person) {
+        person.name = sjcl.json.decrypt(window.password, person.encrypted_name)
 		var element = $(template(person));
 		element.prependTo('#choices').hide().slideDown();
 		return element;
@@ -32,9 +43,7 @@ $(function() {
 		$.get('/chosen', {}, function(data) {
 			$('#choices').html('');
 			$.each(data, function (i, choice) {
-				$.getJSON('http://dnd.hackdartmouth.org/?callback=?', {'uid':choice}, function(data, textStatus, jqXHR) {
-					choose(data[0]);
-				});
+                choose(choice);
 			});
 		}, 'json');
 	};
@@ -43,7 +52,6 @@ $(function() {
 		$.get('/matches', {}, function(data) {
 			$('#matches').html('');
 			$.each(data, function (i, choice) {
-              debugger;
               match(choice);
 			});
 		}, 'json');
@@ -52,7 +60,7 @@ $(function() {
 
 	$(document).on('click', '.unchoose', function (e) {
 		$(this).parent().slideUp();
-		$.post('/unchoose', {'choice': $(this).data('uid') }, function() {
+		$.post('/unchoose', {'coupleid_hash': $(this).data('coupleidhash') }, function() {
 		}).fail(function(jqxhr) {
 		});
 	});
@@ -73,15 +81,17 @@ $(function() {
         
         var coupleid_hash = sjcl.codec.hex.fromBits(window.private_key.dh(pub_key));
 
-		var element = choose(data);
-		$.post('/choose', {'coupleid_hash': coupleid_hash}, function() {
+        var encrypted_name = sjcl.json.encrypt(window.password, data['name']);
+
+		$.post('/choose', {'coupleid_hash': coupleid_hash, 'encrypted_name': encrypted_name}, function() {
 			$(".alert-danger").hide()
 			$("#search input").val('');
+            fill_choices();
 		}).fail(function(jqxhr) {
 			var data = JSON.parse(jqxhr.responseText);
 			$(".alert-danger .alerttext").html(data.error);
 			$(".alert-danger").show();
-			element.remove();
+            fill_choices();
 		});
 	});
 
